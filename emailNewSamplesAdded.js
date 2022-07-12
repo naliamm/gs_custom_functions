@@ -1,3 +1,5 @@
+// TODO: Install time trigger on Apps Script if this is the first time using this script
+
 const SOURCE_SHEET = SpreadsheetApp
   .openByUrl("<GOOGLE-SHEETS-URL")
   .getSheetByName("<SHEET-NAME>");
@@ -13,7 +15,7 @@ var sourceCurrentIndex = parseInt(getLastRowIndex(SOURCE_SHEET, "B"));
  * Check for mismatched data, if there's any
  * Send an email of all the changes
  */
-function emailNewSamplesAdded() { // TODO: Install time trigger
+function emailNewSamplesAdded() {
   // Return if no new run
   if (isNaN(sourceCurrentIndex)) {
     return;
