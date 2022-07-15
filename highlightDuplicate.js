@@ -8,11 +8,11 @@ function onEdit(e) {
   let inputValue = e.range;
 
   // Return if not the barcode column and not the samples_information sheet
-  if ( (inputValue.getSheet().getSheetName() !== "samples_information") || (inputValue.getColumn() !== 6) ) {
+  if ( (inputValue.getSheet().getSheetName() != "samples_information") || (inputValue.getColumn() != 6) ) {
     return;
   
   // Clear format if empty input or previous value has been deleted
-  } else if ( (inputValue.getValues == "") || (inputValue.getSheet().getSheetName() == "samples_information") || (inputValue.getColumn() == 6)){
+  } else if ( (inputValue.getValues() == "") && (inputValue.getSheet().getSheetName() == "samples_information") && (inputValue.getColumn() == 6) ) {
     inputValue.clearFormat();
     return;
   }
@@ -25,7 +25,6 @@ function onEdit(e) {
 }
 
 // TODO: Add note when there is duplicate notifying that it's a duplicate */
-//       Add getLastRowInColumn() from emailNewSamplesAdded()
 /**
  * Highlights barcodes that are similar to the inputValue
  * @param {string} inputValue - Library barcode
@@ -34,14 +33,11 @@ function highlightDuplicate(inputValue) {
   let sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("samples_information");
 
   // Get the row to start conditional formatting from
-  let dateRange = sheet.getRange("J2:J"); // start is defined by the first empty row in submission_date column
-  let submitDates = dateRange.getValues();
-  let rowStart = submitDates.filter(String).length + 2; // the last row with non-empty cell
+  let rowStart = getLastRowInColumn(sheet, "K") + 1;
 
   // Get the barcodes that are being used in current run
-  let startRange = "E" + rowStart + ":E";
-  let usedBarcodes = sheet.getRange(startRange).getValues();
-  let currentBarcodes = usedBarcodes.filter(String); // this filters for the barcodes that are currently being used starting from start_row to inputValue
+  let barcodesRange = sheet.getRange("F" + rowStart + ":F" + getLastRowInColumn(sheet, "F"));
+  let currentBarcodes = (barcodesRange.getValues()).filter(String);
 
   // First barcode of a new run does not have a duplicate
   if (currentBarcodes.length == 1) {
@@ -61,18 +57,10 @@ function highlightDuplicate(inputValue) {
 
     // Highlight if a duplicate
     } else {
-      //inputValue.setNote("duplicate!!");
-      let usedBarcodesRange = sheet.getRange("E2:E");
-      let usedBarcodesValues = usedBarcodesRange.getValues();
-      let rowEnd = usedBarcodesValues.filter(String).length + 1;
-      let formatRange = "E" + rowStart + ":E" + rowEnd;
-
-      let ruleRange = sheet.getRange(formatRange);
-
       let rule = SpreadsheetApp.newConditionalFormatRule()
       .whenTextEqualTo(inputValue.getValues())
       .setBackground("#F4CCCC")
-      .setRanges([ruleRange])
+      .setRanges([barcodesRange])
       .build();
 
       let rules = sheet.getConditionalFormatRules();
@@ -82,4 +70,23 @@ function highlightDuplicate(inputValue) {
       return;
     }
   } 
+}
+
+/**
+ * Get the last row with samples information from a column
+ * @param {object} sheet
+ * @param {int} column
+ * @return {int}
+ */
+function getLastRowInColumn(sheet, column) {
+  var lastContent = sheet.getLastRow();
+  var colRange = sheet.getRange(column + "1:" + column + lastContent);
+  var colValues = (colRange.getValues()).filter(String);
+  var lastRow = colValues.length;
+
+  if (lastRow == 0) {
+    return 0;
+  } else {
+    return lastRow;
+  }
 }
