@@ -64,15 +64,15 @@ function emailNewSamplesAdded() {
  * @return {array} mismatchedRows
  */
 function findMismatchedRows() {
-  var mismatchedRows = Array();
+  var mismatchedRows = new Set();
 
   let sourceRange = SOURCE_SHEET
-  .getRange("A2:I" + getLastRowInColumn(SOURCE_SHEET, "B"))
+  .getRange("A2:L" + getLastRowInColumn(SOURCE_SHEET, "B"))
   .getValues();
     
   let mainStartRow = SOURCE_SHEET.getRange("A2").getValue();
   let mainRange = MAIN_SHEET
-  .getRange("A" + (mainStartRow+1) + ":I" + getLastRowInColumn(MAIN_SHEET, "B"))
+  .getRange("A" + (mainStartRow+1) + ":L" + getLastRowInColumn(MAIN_SHEET, "B"))
   .getValues();
 
   // Get row and col numbers of mismatched data
@@ -80,8 +80,7 @@ function findMismatchedRows() {
     for (let j = 0; j < sourceRange[1].length; j++) {
       if (sourceRange[i][j] != mainRange[i][j]) {
         let rowIndex = sourceRange[i][0];
-        let message = "Row Index " + rowIndex + " : Column " + (j+2);
-        mismatchedRows.push(message);
+        mismatchedRows.add(rowIndex);
       }
     }
 
@@ -93,12 +92,9 @@ function findMismatchedRows() {
       //   }
   } 
   
-  if (mismatchedRows.length == 0) {
+  if (mismatchedRows.size == 0) {
     return parseInt(0);
   }
-
-  return mismatchedRows;
-}
 
 /**
  * Get the last row with samples information from a column
