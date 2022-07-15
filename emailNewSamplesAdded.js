@@ -95,6 +95,9 @@ function findMismatchedRows() {
   if (mismatchedRows.size == 0) {
     return parseInt(0);
   }
+  
+  return [...mismatchedRows];
+}
 
 /**
  * Get the last row with samples information from a column
