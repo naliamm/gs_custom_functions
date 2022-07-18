@@ -1,11 +1,9 @@
-// TODO: Install time trigger on Apps Script if this is the first time using this script
-
 const SOURCE_SHEET = SpreadsheetApp
-  .openByUrl("<GOOGLE-SHEETS-URL")
+  .openByUrl("<GOOGLE-SHEETS-LINK")
   .getSheetByName("<SHEET-NAME>");
   
 const MAIN_SHEET = SpreadsheetApp
-  .openByUrl("<GOOGLE-SHEETS-URL")
+  .openByUrl("<GOOGLE-SHEETS-LINK>")
   .getSheetByName("<SHEET-NAME>");
 
 var mainCurrentIndex = parseInt(getLastRowIndex(MAIN_SHEET, "B"));
@@ -15,7 +13,7 @@ var sourceCurrentIndex = parseInt(getLastRowIndex(SOURCE_SHEET, "B"));
  * Check for mismatched data, if there's any
  * Send an email of all the changes
  */
-function emailNewSamplesAdded() {
+function emailNewSamplesAdded() { // TODO: Install time trigger
   // Return if no new run
   if (isNaN(sourceCurrentIndex)) {
     return;
@@ -27,7 +25,7 @@ function emailNewSamplesAdded() {
       return;
     } else {
       let emailBody = "No new samples added. \n Mismatched rows have index: " + mismatchedRows; 
-      GmailApp.sendEmail('<EMAIL-ADDRESS>', '<EMAIL-SUBJECT>', emailBody);
+      GmailApp.sendEmail('<EMAIL-ADDRESS>', '[UPDATES-TO-SAMPLES-MAINLIST]', emailBody);
     }
   
   // Add new samples to the masterlist
@@ -47,11 +45,11 @@ function emailNewSamplesAdded() {
     let mismatchedRows = findMismatchedRows();
       if (mismatchedRows == 0) {
         emailBody = emailBody + "No mismatched rows";
-        GmailApp.sendEmail('<EMAIL-ADDRESS>', '<EMAIL-SUBJECT>', emailBody);
+        GmailApp.sendEmail('<EMAIL-ADDRESS>', '[UPDATES-TO-SAMPLES-MAINLIST]', emailBody);
         return;
       } else {
         let emailBody = "Mismatched rows have index: " + mismatchedRows; 
-        GmailApp.sendEmail('<EMAIL-ADDRESS>', '<EMAIL-SUBJECT>', emailBody);
+        GmailApp.sendEmail('<EMAIL-ADDRESS>', '[UPDATES-TO-SAMPLES-MAINLIST]', emailBody);
         return;
       }
   }
@@ -67,12 +65,12 @@ function findMismatchedRows() {
   var mismatchedRows = new Set();
 
   let sourceRange = SOURCE_SHEET
-  .getRange("A2:L" + getLastRowInColumn(SOURCE_SHEET, "B"))
+  .getRange("A2:I" + getLastRowInColumn(SOURCE_SHEET, "B"))
   .getValues();
     
   let mainStartRow = SOURCE_SHEET.getRange("A2").getValue();
   let mainRange = MAIN_SHEET
-  .getRange("A" + (mainStartRow+1) + ":L" + getLastRowInColumn(MAIN_SHEET, "B"))
+  .getRange("A" + (mainStartRow+1) + ":I" + getLastRowInColumn(MAIN_SHEET, "B"))
   .getValues();
 
   // Get row and col numbers of mismatched data
@@ -95,7 +93,7 @@ function findMismatchedRows() {
   if (mismatchedRows.size == 0) {
     return parseInt(0);
   }
-  
+
   return [...mismatchedRows];
 }
 
