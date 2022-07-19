@@ -62,39 +62,37 @@ function emailNewSamplesAdded() { // TODO: Install time trigger
  * @return {array} mismatchedRows
  */
 function findMismatchedRows() {
-  var mismatchedRows = new Set();
+  var mismatchedRows = {};
 
   let sourceRange = SOURCE_SHEET
-  .getRange("A2:I" + getLastRowInColumn(SOURCE_SHEET, "B"))
+  .getRange("A2:L" + getLastRowInColumn(SOURCE_SHEET, "B"))
   .getValues();
     
   let mainStartRow = SOURCE_SHEET.getRange("A2").getValue();
   let mainRange = MAIN_SHEET
-  .getRange("A" + (mainStartRow+1) + ":I" + getLastRowInColumn(MAIN_SHEET, "B"))
+  .getRange("A" + (mainStartRow+1) + ":L" + getLastRowInColumn(MAIN_SHEET, "B"))
   .getValues();
 
   // Get row and col numbers of mismatched data
   for (let i = 0; i < sourceRange.length; i++) {
+    let mismatchedCols = Array();
+    let rowIndex = "Row Index " + (mainStartRow + i) + ": ";
+
     for (let j = 0; j < sourceRange[1].length; j++) {
       if (sourceRange[i][j] != mainRange[i][j]) {
-        let rowIndex = sourceRange[i][0];
-        mismatchedRows.add(rowIndex);
+        mismatchedCols.push(j+1);
+        mismatchedRows[rowIndex] = mismatchedCols;
       }
     }
-
-      // TODO: Handle which specific column value has been changed
-      // for (let j = 0; j < sourceData[1].length; j++) {
-      //   if ( String(sourceData[i][j]) != String(mainData[i][j]) ) {
-      //     let rowIndex = sourceData[i][0];
-      //     mismatchedRows.push(rowIndex)
-      //   }
   } 
   
-  if (mismatchedRows.size == 0) {
+  // TODO: Fix random comma - IDK where this comes from..??
+
+  if (Object.keys(mismatchedRows) == 0) {
     return parseInt(0);
   }
 
-  return [...mismatchedRows];
+  return Object.entries(mismatchedRows);
 }
 
 /**
