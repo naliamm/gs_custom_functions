@@ -1,9 +1,9 @@
 const SOURCE_SHEET = SpreadsheetApp
-  .openByUrl("<GOOGLE-SHEETS-LINK")
+  .openByUrl("<SHEET-URL>")
   .getSheetByName("<SHEET-NAME>");
   
 const MAIN_SHEET = SpreadsheetApp
-  .openByUrl("<GOOGLE-SHEETS-LINK>")
+  .openByUrl("<SHEET-URL>")
   .getSheetByName("<SHEET-NAME>");
 
 var mainCurrentIndex = parseInt(getLastRowIndex(MAIN_SHEET, "B"));
@@ -16,19 +16,25 @@ var sourceCurrentIndex = parseInt(getLastRowIndex(SOURCE_SHEET, "B"));
 function emailNewSamplesAdded() { // TODO: Install time trigger
   // Return if no new run
   if (isNaN(sourceCurrentIndex)) {
+    GmailApp.sendEmail('<EMAIL-ADDRESS>', '[Samples mainlist]', "No new run.");
     return;
   
-  // No new samples for existing run, check and notify for mismatched rows if there's any
+  // New run, no new samples added
   } else if (mainCurrentIndex == sourceCurrentIndex) {
     let mismatchedRows = findMismatchedRows();
+    
+    // No mismatched rows
     if (mismatchedRows == 0) {
+      GmailApp.sendEmail('<EMAIL-ADDRESS>', '[Samples mainlist]', "All is well.");
       return;
+    
+    // There's mismatched rows
     } else {
-      let emailBody = "No new samples added. \n Mismatched rows have index: " + mismatchedRows; 
-      GmailApp.sendEmail('<EMAIL-ADDRESS>', '[UPDATES-TO-SAMPLES-MAINLIST]', emailBody);
+      let emailBody = "No new samples added. \n Mismatched rows have index: " + mismatchedRows;
+      GmailApp.sendEmail('<EMAIL-ADDRESS>', '[Samples mainlist]', emailBody);
     }
   
-  // Add new samples to the masterlist
+  // New run, new samples added
   } else {
     let numNewSamples = sourceCurrentIndex - mainCurrentIndex;
     let sourceRangeToCopy = SOURCE_SHEET.getRange(parseInt(getSourceStartRow()), 2, numNewSamples, 11);
@@ -41,17 +47,20 @@ function emailNewSamplesAdded() { // TODO: Install time trigger
     " new sample(s) have been added. \n\t Sample(s) start from Row Index " +
     (mainCurrentIndex + 1);
 
-    // Check for mismatch if existing samples in SOURCE_SHEET have been modified
     let mismatchedRows = findMismatchedRows();
-      if (mismatchedRows == 0) {
-        emailBody = emailBody + "No mismatched rows";
-        GmailApp.sendEmail('<EMAIL-ADDRESS>', '[UPDATES-TO-SAMPLES-MAINLIST]', emailBody);
-        return;
-      } else {
-        let emailBody = "Mismatched rows have index: " + mismatchedRows; 
-        GmailApp.sendEmail('<EMAIL-ADDRESS>', '[UPDATES-TO-SAMPLES-MAINLIST]', emailBody);
-        return;
-      }
+    
+    // No mismatched rows
+    if (mismatchedRows == 0) {
+      emailBody = emailBody + "\nNo mismatched rows.";
+      GmailApp.sendEmail('<EMAIL-ADDRESS>', '[Samples mainlist]', emailBody);
+      return;
+    
+    // There's mismatched rows
+    } else {
+      emailBody = emailBody + "\nMismatched rows have index: " + mismatchedRows; 
+      GmailApp.sendEmail('<EMAIL-ADDRESS>', '[Samples mainlist]', emailBody);
+      return;
+    }
   }
 }
 
@@ -65,12 +74,12 @@ function findMismatchedRows() {
   var mismatchedRows = {};
 
   let sourceRange = SOURCE_SHEET
-  .getRange("A2:L" + getLastRowInColumn(SOURCE_SHEET, "B"))
+  .getRange("A2:I" + getLastRowInColumn(SOURCE_SHEET, "B"))
   .getValues();
     
   let mainStartRow = SOURCE_SHEET.getRange("A2").getValue();
   let mainRange = MAIN_SHEET
-  .getRange("A" + (mainStartRow+1) + ":L" + getLastRowInColumn(MAIN_SHEET, "B"))
+  .getRange("A" + (mainStartRow+1) + ":I" + getLastRowInColumn(MAIN_SHEET, "B"))
   .getValues();
 
   // Get row and col numbers of mismatched data
