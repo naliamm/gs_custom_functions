@@ -1,42 +1,41 @@
 /**
  * Highlights barcodes that are being used >1 in the current sequencing run.
- * Current sequencing run is defined by empty submission_date (i.e.; samples have not been
- * submitted for sequencing)
  * @param {object} e - Trigger event when someone enters a new sample 
+ * 
  */
 function onEdit(e) {
   let inputValue = e.range;
-
-  // Return if not the barcode column and not the samples_information sheet
-  if ( (inputValue.getSheet().getSheetName() != "samples_information") || (inputValue.getColumn() != 6) ) {
-    return;
+  let sheetName = inputValue.getSheet().getSheetName();
+  let colNum = inputValue.getColumn();
   
-  // Clear format if empty input or previous value has been deleted
-  } else if ( (inputValue.getValues() == "") && (inputValue.getSheet().getSheetName() == "samples_information") && (inputValue.getColumn() == 6) ) {
-    inputValue.clearFormat();
-    return;
-  }
+  if ( (sheetName == "<bla>") && (colNum == <num>) ) {
+    
+    // Clear format if empty input or previous value has been deleted
+    if (inputValue.getValues() == "") {
+      inputValue.clear({formatOnly: "true"});
+      inputValue.setBackground("#d9ead3");
+      return;
 
-  // Highlight if input is a duplicate
-  else {
-    highlightDuplicate(inputValue);
+    // Highlight duplicate barcodes in the same COLUMN for the same run
+    } else {
+      let sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
+      highlightDuplicate(sheet, inputValue, "<col>");
+      return;
+    }
+    
+  } else {
     return;
-  }
+    }
 }
 
-// TODO: Add note when there is duplicate notifying that it's a duplicate */
 /**
  * Highlights barcodes that are similar to the inputValue
  * @param {string} inputValue - Library barcode
  */
-function highlightDuplicate(inputValue) {
-  let sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("samples_information");
-
-  // Get the row to start conditional formatting from
-  let rowStart = getLastRowInColumn(sheet, "K") + 1;
-
+function highlightDuplicate(sheet, inputValue, colToHighlight) {
+  
   // Get the barcodes that are being used in current run
-  let barcodesRange = sheet.getRange("F" + rowStart + ":F" + getLastRowInColumn(sheet, "F"));
+  let barcodesRange = sheet.getRange(colToHighlight + "2:" + colToHighlight + getLastRowInColumn(sheet, colToHighlight));
   let currentBarcodes = (barcodesRange.getValues()).filter(String);
 
   // First barcode of a new run does not have a duplicate
@@ -70,23 +69,4 @@ function highlightDuplicate(inputValue) {
       return;
     }
   } 
-}
-
-/**
- * Get the last row with samples information from a column
- * @param {object} sheet
- * @param {int} column
- * @return {int}
- */
-function getLastRowInColumn(sheet, column) {
-  var lastContent = sheet.getLastRow();
-  var colRange = sheet.getRange(column + "1:" + column + lastContent);
-  var colValues = (colRange.getValues()).filter(String);
-  var lastRow = colValues.length;
-
-  if (lastRow == 0) {
-    return 0;
-  } else {
-    return lastRow;
-  }
 }
