@@ -1,0 +1,28 @@
+<div dir="ltr">
+    <br>
+    <div>
+        <table cellspacing="0" cellpadding="0" dir="ltr" border="1" style="table-layout:fixed;font-size:10pt;font-family:Arial;width:0px;border-collapse:collapse;border:none">
+            <colgroup>
+                <col width="100">
+                    <col width="170">
+                        <col width="170">
+            </colgroup>
+            <tbody>
+                <tr style="height:21px">
+                    <td style="border:1px solid rgb(0,0,0);overflow:hidden;padding:2px 3px;vertical-align:bottom;background-color:rgb(183,183,183)"></td>
+                    <td style="border-width:1px;border-style:solid;border-color:rgb(0,0,0) rgb(0,0,0) rgb(0,0,0) rgb(204,204,204);overflow:hidden;padding:2px 3px;vertical-align:bottom;background-color:rgb(183,183,183)">New samples</td>
+                    <td style="border-width:1px;border-style:solid;border-color:rgb(0,0,0) rgb(0,0,0) rgb(0,0,0) rgb(204,204,204);overflow:hidden;padding:2px 3px;vertical-align:bottom;background-color:rgb(183,183,183)">Mismatched rows</td>
+                </tr>
+
+              <? for(var i = 0; i < data.length; i++) { ?>
+                <tr style="height:21px">
+                    <td style="border-width:1px;border-style:solid;border-color:rgb(204,204,204) rgb(0,0,0) rgb(0,0,0);overflow:hidden;padding:2px 3px;vertical-align:bottom"><?= data[i].dataName ?></td>
+                    <td style="border-width:1px;border-style:solid;border-color:rgb(204,204,204) rgb(0,0,0) rgb(0,0,0) rgb(204,204,204);overflow:hidden;padding:2px 3px;vertical-align:bottom"><?= data[i].newSamples ?></td>
+                    <td style="border-width:1px;border-style:solid;border-color:rgb(204,204,204) rgb(0,0,0) rgb(0,0,0) rgb(204,204,204);overflow:hidden;padding:2px 3px;vertical-align:bottom"><?= data[i].mismatchedRows ?></td>
+                </tr>
+              <? } ?>
+
+            </tbody>
+        </table>
+    </div>
+</div>
