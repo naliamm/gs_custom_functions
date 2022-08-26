@@ -7,9 +7,9 @@ Currently, a Google Sheets is being used to keep track of the samples. The custo
 Add the function(s) to the Google Sheets Apps Script. To do this, click on Extensions > Apps Script.
 Column A of the Google Sheets should be named "Row Index" and contains sequential numbers starting from 1. So, cell A1 would have the value "Row Index". Cell A2 would have the value 1. I probably should provide a Google Sheets template but one could change some parts of the custom functions to suit their own Sheets template. The only thing necessary is the Row Index but everything else depends on what the Sheets is being used for.
 
-**Custom functions:**<br>
-1) `highlightDuplicate()`<br>
-Highlight cells with similar barcodes in the same sequencing run. This does not avoid samples to be barcoded with the same sequences but it will notify user that two samples have the same barcodes. In lab, we have an additional measure to make sure each person uses specific barcodes that are unique only to them, so there is little change of using the same barcode for two different samples. So in theory, hopefully we will never have to see this function runs, but in the event that barcodes are being used >1 in the same run, we have a way to catch that.<br>
-2) `emailNewSamplesAdded()`<br>
-This function was created to keep track of samples in the masterlist and those in the input Google Sheets. The email part is just to notify me if there have been new samples added and if there are any changes to the previous samples. Perhaps one could use other methods of notification, but it's easier for me to use email because once I get to my desk every morning, I will have received an email of the changes made to the masterlist.
-For this function, I'm using it to send me an email update every morning. To do this on Apps Script, follow the instructions here: https://developers.google.com/apps-script/guides/triggers/installable
+Each of the file will have its own separate script file in Apps Script, so in total, there are 4 script files on Apps Script for one spreadsheet. This spreadsheet contains multiple sheet tabs. Notably, for each type of experiment (i.e.; Bulk ATAC or SHARE-seq), there will be two sheet tabs namely the source sheet (where lab members input their samples information) and the main sheet (masterlist of all samples from previous runs until the current run).
+
+**Note:**<br>
+Make sure to install trigger for the functions onEdit() and updateMainSheet(). To do this on Apps Script, follow the instructions here: https://developers.google.com/apps-script/guides/triggers/installable
+
+The updateMainSheet() function is a time-triggered event. The way I use this function is to notify me by email every morning of what changes have been done to the Spreadsheet. I use daily trigger that runs once between the time 8AM-9AM.
